@@ -1,5 +1,6 @@
 import os
 import requests
+import time
 
 state = "Alpha"
 version = 1.0
@@ -21,21 +22,36 @@ if not url.startswith("http"):
     url = "http://" +  url
 
 name = input("Please name the package (When adding spaces, please add \\'s).")
-fullPath = "usr/share/" + name
+fullPath = "/usr/share/" + name + "/"
+shortcutName = name + ".sh"
+desktopPath = "~/Desktop/" + shortcutName
+
 if not name.endswith(".py"):
     fileName = name + ".py"
 
-print("Downloading file...")
+print("Downloading file...\n0% ||||||||||", end="")
 fullFile = requests.get(url)
 file_ = fullFile.text
+print("Downloaded file.\n25% ///|||||||", end="")
 
-
-if checkDir("/usr/share/", name):
+if not os.path.exists(fullPath) and not os.path.exists(desktopPath):
     os.chdir("/usr/share/")
-    os.mkdir(name)
-    os.chdir(fullPath)
+    print("Making Directory\n25% ///|||||||", end="")
+    os.makedirs(name)
+    print("Made Directory\n50% /////|||||", end="")
+    os.chdir(name)
+    print("Dropping file...\n50% /////|||||")
     with open(fileName, "w") as pyFile:
         pyFile.write(file_)
+    print("Dropped file.\n75% ////////||")
+
+    os.chdir("~/Desktop/")
+    print("Writing shortcut...\n75% ////////||")
+    with open(fileName, "w") as shFile:
+        shFile.write("python3 " + fullPath + """
+        exit""")
+    print("Complete!")
+    
 
 else:
     print("The directory already exists.")
