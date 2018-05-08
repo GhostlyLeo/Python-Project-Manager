@@ -1,6 +1,13 @@
+print("Loading...\n")
+print("Importing OS...")
 import os
+print("Importing Requests...")
 import requests
+print("Importing Time...")
 import time
+print("Import Pip...")
+import pip
+os.system("clear")
 
 state = "Alpha"
 version = 1.0
@@ -11,6 +18,34 @@ def checkDir(path, dirname):
     if dirname in dir_:
         return False
     return True
+
+def fileLen(fname): # Thanks to SilentGhost on StackOverflow
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
+def checkImports(fileName_):
+    noImportsLeft = False
+    importList = []
+    fileLength= fileLen(fileName_)
+    with open(fileName_, "r") as pyFile:
+        for i in range(0, fileLength):
+            pyLine = pyFile.readline()
+            if pyLine.startswith("import") or pyLine.startswith("from"):
+                importRaw = pyLine.split(" ")
+                importStr = importRaw[1]
+                if importStr.endswith("\n"):
+                    importStr, junk = importStr.split("\n")
+                importList.append(importStr)
+    return importList
+
+def pipInstall(package): # Thanks
+    pip.main(['install', package])
+
+def installPackages(importList):
+    for i in importList:
+        pipInstall(i)
 
 print("Python Project Manager", fullVersion, "(Linux, tested on Lubuntu)\n")
 print("Currently doesn't support large python projects with frameworks (for example Django projects).")
@@ -55,8 +90,9 @@ if not os.path.exists(fullPath):
     os.chdir(name) # Change directory to that file
     os.system("clear")
     print("\nDropping file...\n50% /////|||||", end="")
-    with open(fileName, "w") as pyFile: # Create a new .py file
+    with open(fileName, "w+") as pyFile: # Create a new .py file
         pyFile.write(file_) # Write the info to that new .py file
+    toBeImported = checkImports(fileName)
     os.system("clear") 
     print("\nDropped file.\n75% ////////||", end="")
 
@@ -67,6 +103,11 @@ if not os.path.exists(fullPath):
     with open(shortcutName, "w") as shFile: # Write the shortcut using the content from above.
         shFile.write(shortcutContent)
     os.system("clear")
+
+    print("Installing Packages...")
+    installPackages(toBeImported)
+    os.system("clear")
+    print(toBeImported)
     print("\rComplete! 100% //////////") # Done!
 else:
     print("The directory already exists.")
